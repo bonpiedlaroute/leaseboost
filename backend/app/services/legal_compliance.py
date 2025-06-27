@@ -7,7 +7,7 @@ import openai
 import logging
 from app.models.schemas import LegalAlert, CriticalDeadline
 from app.utils.data.legal_framework import LEGAL_FRAMEWORK
-
+from app.config import Settings
 
 class LegalComplianceService:
     """ legal compliance service"""
@@ -74,7 +74,7 @@ class LegalComplianceService:
 
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-4.1-mini",
+                model=Settings.openai_model,
                 messages=[
                     {"role": "system", "content": "Tu es un expert juridique en baux commerciaux. Réponds uniquement en JSON valide."},
                     {"role": "user", "content": extraction_prompt}
@@ -143,7 +143,7 @@ class LegalComplianceService:
 
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-4.1-mini",
+                model=Settings.openai_model,
                 messages=[
                     {"role": "system", "content": " Tu es un expert en gestion de baux commerciaux. Extrais uniquement les dates futures. Réponds uniquement en JSON valide. "},
                     {"role": "user", "content": extraction_prompt}
@@ -248,7 +248,7 @@ class LegalComplianceService:
 
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-4.1-mini",
+                model=Settings.openai_model,
                 messages=[
                     {"role": "system", "content": "Tu es un juriste spécialisé en baux commerciaux. Extrais uniquement les clauses importantes."},
                     {"role": "user", "content": extraction_prompt}
@@ -311,7 +311,7 @@ class LegalComplianceService:
         """
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-4.1-mini",
+                model=Settings.openai_model,
                 messages=[
                     {"role": "system", "content": "Tu es un expert juridique en droit commercial. Sois précis et factuel."},
                     {"role": "user", "content": verification_prompt}

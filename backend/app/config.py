@@ -9,6 +9,10 @@ class Settings:
     file_cleanup_minutes: int = 5
     max_file_size_mb: int = 10
 
+    legifrance_client_id: str = os.getenv("LEGIFRANCE_CLIENT_ID")
+    legifrance_client_secret: str = os.getenv("LEGIFRANCE_CLIENT_SECRET")
+    openai_model : str = "gpt-4.1-mini"
+
     carte_loyers_api: str = "https://www.data.gouv.fr/api/1/datasets/"
 
 
