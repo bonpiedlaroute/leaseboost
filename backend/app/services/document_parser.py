@@ -16,6 +16,7 @@ class DocumentParser:
 
     async def extract_text_from_file(self, file_content: bytes, filename: str) -> Optional[str]:
 
+        self.logger.info(f"Extracting text from file {filename}")
         if not self._validate_inputs(file_content, filename):
             return None
         
