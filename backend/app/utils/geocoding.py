@@ -15,7 +15,7 @@ class GeocodingService:
         self.logger = logger or logging.getLogger(__name__)
 
     async def geocode_address(self, address: str) ->  Optional[Dict[str, float]]:
-
+        
         if not address or len(address.strip()) < 5:
             return None
         
@@ -30,6 +30,7 @@ class GeocodingService:
                 timeout=5.0
             )
 
+            
             if location:
                 result = {
                     'lat': location.latitude,

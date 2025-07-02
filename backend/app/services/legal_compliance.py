@@ -174,7 +174,7 @@ class LegalComplianceService:
                         urgency = urgency_mapping.get(deadline_data.get("urgency_level"), "MEDIUM")
 
                         deadlines.append(CriticalDeadline(
-                            type=deadline_date["type"],
+                            type=deadline_data["type"],
                             date=deadline_data["date"],
                             days_remaining=days_remaining,
                             urgency=urgency,
@@ -344,7 +344,7 @@ class LegalComplianceService:
 
         try:
             async with httpx.AsyncClient() as client:
-                auth_url = f"oauth.{self.legifrance_base_url}/token"
+                auth_url = "https://oauth.piste.gouv.fr/api/oauth/token"
                 auth_data = {
                     "grant_type": "client_credentials",
                     "client_id": self.legifrance_client_id,
@@ -383,41 +383,83 @@ class LegalComplianceService:
         article = legal_mapping.get(clause_type.lower(), "L145-1")
 
         if not self.legifrance_token:
-            await self._authenticate_legifrance()
+            self.legifrance_token = await self._authenticate_legifrance()
 
         if not self.legifrance_token:
+            self.logger.error("Error during LegiFrance authentication - using local framework")
             return f"Article {article} Code de commerce - voir le framework local pour détails"
         
         try:
             async with httpx.AsyncClient() as client:
-                search_url = f"{self.legifrance_base_url}/search"
+                search_url = f"{self.legifrance_base_url}/dila/legifrance/lf-engine-app/search"
 
                 headers = {
                     "Authorization": f"Bearer {self.legifrance_token}",
                     "Content-Type": "application/json"
                 }
-
-                search_params = {
-                    "query": f"article {article} code de commerce",
-                    "type": "code",
-                    "typePagination": "DEFAULT",
-                    "sort": "PERTINENCE",
-                    "pageNumber": 1,
-                    "pageSize": 1
+                json_request = {
+                    "recherche": {
+                        "champs": [
+                            {
+                                "criteres": [
+                                    {
+                                        "valeur": f"article {article}",
+                                        "operateur": "ET",
+                                        "typeRecherche": "TOUS_LES_MOTS_DANS_UN_CHAMP"
+                                    },
+                                    {
+                                        "valeur": "code de commerce",
+                                        "operateur": "ET", 
+                                        "typeRecherche": "TOUS_LES_MOTS_DANS_UN_CHAMP"
+                                    }
+                                ],
+                                "operateur": "ET",
+                                "typeChamp": "TITLE"
+                            }
+                        ],
+                        "filtres": [
+                            {
+                                "valeurs": ["CODE"],
+                                "facette": "NATURE"
+                            }
+                        ],
+                        "sort": "PERTINENCE",
+                        "fromAdvancedRecherche": False,
+                        "secondSort": "ID",
+                        "pageSize": 1,
+                        "operateur": "ET",
+                        "typePagination": "DEFAUT",
+                        "pageNumber": 1
+                    },
+                    "fond": "LODA_DATE" 
                 }
 
-                response = await client.post(search_url, json=search_params, headers=headers)
+
+                response = await client.post(search_url, json=json_request, headers=headers)
 
                 response.raise_for_status()
 
                 search_results = response.json()
 
-                if search_results.get("results"):
+                if search_results.get("results") and len(search_results["results"]) > 0:
                     first_result = search_results["results"][0]
 
+                    # text can be in different fields, depending of the type of result
                     article_text = first_result.get("text", "")
-
-                    return f"Article {article} du Code de commerce: {article_text[:500]}..."
+                    # if no direct text we try to get it from sections
+                    if not article_text and first_result.get("sections"):
+                        for section in first_result["sections"]:
+                            if section.get("extracts"):
+                                for extract in section["extracts"]:
+                                    if extract.get("values"):
+                                        article_text = "".join(extract["values"])
+                                        break
+                            if article_text:
+                                break
+                    if article_text:
+                        return f"Article {article} du Code de commerce: {article_text[:500]}..."
+                    else:
+                        return f"Article {article} du Code de commerce - Structure de réponse inattendue"
                 else:
                     return f"Article {article} du Code de commerce - Texte non trouvé via API"
 

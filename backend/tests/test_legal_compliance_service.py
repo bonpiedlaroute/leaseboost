@@ -150,12 +150,11 @@ class TestLegalComplianceService:
         if service.legifrance_client_id and service.legifrance_client_secret:
             token = await service._authenticate_legifrance()
 
-            if token:
-                assert isinstance(token, str)
-                assert len(token) > 10 
-                assert service.legifrance_token == token
-            else:
-                assert service.legifrance_token is None
+            
+            assert isinstance(token, str)
+            assert len(token) > 10 
+            assert service.legifrance_token == token
+            
 
     @pytest.mark.asyncio
     async def test_get_legal_context_legifrance(self, service):

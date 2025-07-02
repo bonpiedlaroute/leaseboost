@@ -14,6 +14,7 @@ class Settings:
     openai_model : str = "gpt-4.1-mini"
 
     carte_loyers_api: str = "https://www.data.gouv.fr/api/1/datasets/"
+    sheet_id: str = "1EMbc_r7HHA6PoUG2f9SZV7nlAZ3oFhxjum69mr3xkpw"
 
 
 settings = Settings()

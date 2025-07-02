@@ -59,12 +59,12 @@ document_parser = DocumentParser(logger=app_logger)
 
 @app.on_event("startup")
 async def startup_event():
-    file_cleanup_service.start_cleanup_scheduler()
+    #file_cleanup_service.start_cleanup_scheduler() # in memory for now
     app_logger.info("LeaseBoost Service started")
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    file_cleanup_service.stop_cleanup_scheduler()
+    #file_cleanup_service.stop_cleanup_scheduler() # in memory for now
     app_logger.info("LeaseBoost Service stopped")
 
 @app.get("/")

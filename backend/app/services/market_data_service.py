@@ -9,7 +9,26 @@ from app.utils.cities import postalcodeByCity
 
 import statistics
 import logging
-from app.config import settings
+import requests
+from app.config import Settings
+from io import StringIO
+
+class GoogleSheetsService:
+    @staticmethod
+    def read_public_sheet(sheet_id: str, gid: int = 0) -> Optional[pd.DataFrame]:
+        url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+
+            df = pd.read_csv(StringIO(response.text))
+            return df
+
+        except Exception as e:
+            print(f"Error fetching data from Google Sheets: {e}")
+            return None
+
+sheets_service = GoogleSheetsService()   
 
 class MarketDataService:
     """
@@ -17,7 +36,7 @@ class MarketDataService:
     """
 
     def __init__(self, logger: Optional[logging.Logger] = None):
-        self.sheet_url = "https://docs.google.com/spreadsheets/d/1EMbc_r7HHA6PoUG2f9SZV7nlAZ3oFhxjum69mr3xkpw/edit"
+        self.sheet_id = Settings.sheet_id
         self.sheet_data = None
         self.last_refresh = None
         self.geocoder = Nominatim(user_agent="leastboost_intelligence")
@@ -35,32 +54,42 @@ class MarketDataService:
         try:
             # 1.refresh data if necessary
             await self._refresh_data_if_needed()
-
+            print("data refreshed: ")
             if self.sheet_data is None or self.sheet_data.empty:
                 return self._generate_fallback_comparables(target_city, target_surface)
-            
+            print("search exact city: ")
             # 2. search exact city
             exact_matches = self._find_exact_city_matches(target_city, target_surface)
 
+            if exact_matches is None:
+                exact_matches = []
+
             if len(exact_matches) >= 3:
                 return exact_matches[:10]
-            
+            print("search closest city: ")            
             # 3. search closest city
             if target_lat and target_lon:
                 nearby_matches = await self._find_nearby_matches(target_lat, target_lon, target_surface,
                                                                  radius_km=15)
+                if nearby_matches is None:
+                    nearby_matches = []
+                print("combined exact and close matches: ")
                 # combined exact and close matches
                 combined_matches = exact_matches + nearby_matches
                 if len(combined_matches) >= 3:
                     return self._deduplicate_and_rank(combined_matches)[:10]
-
+            print("regional fallback: ")
             # 4. regional fallback    
             regional_matches = self._find_regional_matches(target_city, target_surface)
+
+            if regional_matches is None:
+                regional_matches = []
 
             if len(regional_matches) >= 2:
                 all_matches = exact_matches + regional_matches
                 return self._deduplicate_and_rank(all_matches)[:10]
 
+            print("last fallback: simulated data ")
             # 5. last fallback with simulate data
             return self._generate_smart_fallback(target_city, target_surface, exact_matches)
         
@@ -97,12 +126,8 @@ class MarketDataService:
             try:
                 self.logger.info(f" {refresh_reason}")
 
-                # connection to google sheet
-                gc = gspread.service_account()
-                sheet = gc.open_by_url(self.sheet_url)
 
-                new_data = sheet.get_all_records()
-                new_df = pd.DataFrame(new_data)
+                new_df = sheets_service.read_public_sheet(self.sheet_id)
 
                 if self.sheet_data is not None:
                     old_count = len(self.sheet_data)
@@ -254,7 +279,7 @@ class MarketDataService:
             return []
         
         nearby_comparables = []
-
+        print("start finding nearby matches")
         for _, row in self.sheet_data.iterrows():
             try:
                 row_lat, row_lon = None, None
@@ -277,7 +302,7 @@ class MarketDataService:
                     row_lat, row_lon = city_coords['lat'], city_coords['lon']
 
                 distance  = geodesic((row_lat, row_lon), (target_lat, target_lon)).kilometers
-
+                
                 if distance <= radius_km:
 
                     surface_score = self._calculate_surface_similarity(target_surface, row['AREA'])
@@ -295,8 +320,9 @@ class MarketDataService:
                             'source':'sheet_nearby'
                         })
             except Exception as e:
+                print(f"Error processing row: {row}")
                 continue
-        
+        print(f"finished finding nearby matches : {len(nearby_comparables)} found")
         return sorted(nearby_comparables, key=lambda x: x['similarity_score'], reverse=True)
     
     def _find_regional_matches(self, target_city: str, target_surface: float) -> List[Dict]:
@@ -429,6 +455,8 @@ class MarketDataService:
             if key not in seen:
                 seen.add(key)
                 unique_comparables.append(comp)
+    
+        return unique_comparables
     
     def get_data_freshness_info(self) -> Dict:
 
