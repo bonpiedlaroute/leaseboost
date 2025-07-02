@@ -21,7 +21,7 @@ class MarketIntelligenceService:
             # geocode address
             coordinates = await geocode_address(address)
 
-            print(f"Coordinates: {coordinates}")
+            
             # get comparables
             comparables_data = await self.market_data_service.get_market_comparables(
                 target_city=city,
@@ -29,7 +29,7 @@ class MarketIntelligenceService:
                 target_lat=coordinates.get('lat') if coordinates else None,
                 target_lon=coordinates.get('lon') if coordinates else None                
             )
-            print(f"Comparables: {comparables_data}")
+            
             # convert market comparables
             market_comparables = self._convert_to_market_comparables(comparables_data)
 
@@ -40,7 +40,7 @@ class MarketIntelligenceService:
                 current_rent, 
                 market_comparables
             )
-            print(f"Market position: {market_position}")
+            
             return market_position
         except Exception as e:
             logging.error(f"Error computing market position: {str(e)}")

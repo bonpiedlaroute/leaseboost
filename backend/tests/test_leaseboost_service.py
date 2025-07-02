@@ -90,7 +90,7 @@ class TestLeaseBoostService:
 
         assert isinstance(result, dict)
 
-        #print(f"Données extraites: {result}")
+
 
         if 'address' in result:
             assert isinstance(result['address'], str)
@@ -112,7 +112,7 @@ class TestLeaseBoostService:
 
         assert isinstance(result, dict)
 
-        #print(f"extracted data: {result}")
+
 
         for key, value in result.items():
             if key == 'address' and value is not None:
@@ -152,8 +152,6 @@ class TestLeaseBoostService:
         assert "opportunities" in result
         assert "financial_metrics" in result
         assert "executive_summary" in result
-
-        #print(f" Analyse enrichie: {json.dumps(result, indent=2, ensure_ascii=False)}")
 
         assert isinstance(result["opportunities"], list)
 
@@ -205,7 +203,7 @@ class TestLeaseBoostService:
         assert "executive_summary" in result
 
         summary_lower = result["executive_summary"].lower()
-        #print(f"Summary: {summary_lower}")
+
         assert any(keyword in summary_lower for keyword in ['n/a', 'insuffisant', 'manquant', 'indisponible',
                                                             'non déterminé', 'non précis', 'non identifié', 'incomplet', 'limité',
             'absent', 'vide', 'sans', 'aucun', 'pas de', 'données manquantes'])
@@ -219,7 +217,6 @@ class TestLeaseBoostService:
         enriched_analysis = service._perform_enriched_ai_analysis(complete_lease_with_data, basic_data, market_position_mock, legal_analysis_mock)
 
 
-        #print(f"rich analysis integrated : {json.dumps(enriched_analysis, indent=2, ensure_ascii=False)}")
 
 
         assert isinstance(basic_data, dict)
@@ -242,8 +239,6 @@ class TestLeaseBoostService:
 
         assert isinstance(basic_data, dict)
         
-
-        #print(f"Result with problematic content: {basic_data}")
 
         for key, value in basic_data.items():
             if value is not None:

@@ -82,7 +82,6 @@ class TestLegalComplianceService:
 
         alerts = await service._check_indexation_compliance(lease_with_icc)
         
-        print(f"Number of detected alerts: {len(alerts)}")
         assert len(alerts) >= 0
 
         indexation_alerts = [a for a in alerts if "indexation" in a.type]
@@ -99,7 +98,6 @@ class TestLegalComplianceService:
         deadlines = await service._extract_critical_deadlines(lease_with_deadline)
 
         
-        print(f"Number of detected deadlines: {len(deadlines)}")
         assert isinstance(deadlines, list)
 
         if len(deadlines) >= 1:
@@ -170,7 +168,6 @@ class TestLegalComplianceService:
 
         result = await service.analyze_compliance(lease_with_icc)
 
-        print(f"detected alerts: {len(result['legal_alerts'])}")
         assert isinstance(result["legal_alerts"], list)
 
         if len(result["legal_alerts"]) >= 1:
@@ -271,7 +268,6 @@ class TestLegalComplianceIntegration:
 
         indexation_found = any("indexation" in alert_type for alert_type in alert_types)
 
-        print(f"Indexation trouvée: {indexation_found}")
 
         if len(result["critical_deadlines"]) > 0:
             deadline = result["critical_deadlines"][0]
@@ -297,7 +293,6 @@ class TestLegalComplianceIntegration:
         results = []
 
         for i, lease in enumerate(leases_test):
-            print(f"Analyze lease {i+1}/3 ...")
             output = await service.analyze_compliance(lease)
             results.append(output)
         
@@ -348,5 +343,4 @@ class TestPerformanceReal:
 
         indexation_alerts = [a for a in result["legal_alerts"] if "indexation" in a.type]
 
-        print(f"Indexation alerts: {len(indexation_alerts)}")
         assert isinstance(indexation_alerts, list)

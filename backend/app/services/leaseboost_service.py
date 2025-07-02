@@ -28,7 +28,7 @@ class LeaseBoostService:
 
             basic_data = self._extract_basic_lease_data(lease_content)
 
-            print(f"Basic data: {basic_data}")
+            self.logger.info(f"Basic data: {basic_data}")
             # 2. Extract market intelligence
             market_position = await self.market_intelligence_service.get_market_position(
                 city=basic_data['city'],
@@ -40,7 +40,7 @@ class LeaseBoostService:
             # 3. Extract legal compliance
             legal_compliance = await self.legal_compliance_service.analyze_compliance(lease_content)
 
-            print(f"Legal compliance: {legal_compliance}")
+            self.logger.info(f"Legal compliance: {legal_compliance}")
             # 4 enrich
             ai_analysis = self._perform_enriched_ai_analysis(
                 lease_content,
@@ -48,8 +48,8 @@ class LeaseBoostService:
                 market_position,
                 legal_compliance
             )
-            print("AI analysis complete")
-            print(f"AI analysis: {ai_analysis}")
+            
+            self.logger.info(f"AI analysis: {ai_analysis}")
             return self._build_complete_analysis(
                 market_position, legal_compliance, ai_analysis, basic_data
             )
@@ -185,7 +185,7 @@ class LeaseBoostService:
         """
 
         try:
-            print("calling openai...")
+
             response = self.openai_client.chat.completions.create(
                     model=Settings.openai_model,
                     messages=[
@@ -195,18 +195,15 @@ class LeaseBoostService:
                     temperature=0.1,
                     max_tokens=2000
                 )
-            print(f"after calling openai... : {response.choices[0].message.content}")
+
             response_content = response.choices[0].message.content
             
             if response_content.startswith("```json"):
                 response_content  = response_content.replace("```json", "").replace("```", "")
             
-            print(f"enriched response: {response_content}")
-            result =  json.loads(response_content)
-            print(f"json result: {result}")
-            return result
+            return json.loads(response_content)
         except Exception as e:
-            print(f"Error analyzing lease: {e}")
+            self.logger.error(f"Error analyzing lease: {e}")
             return {
                 "opportunities" : [],
                 "financial_metrics": {},

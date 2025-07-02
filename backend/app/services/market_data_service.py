@@ -54,10 +54,10 @@ class MarketDataService:
         try:
             # 1.refresh data if necessary
             await self._refresh_data_if_needed()
-            print("data refreshed: ")
+
             if self.sheet_data is None or self.sheet_data.empty:
                 return self._generate_fallback_comparables(target_city, target_surface)
-            print("search exact city: ")
+
             # 2. search exact city
             exact_matches = self._find_exact_city_matches(target_city, target_surface)
 
@@ -66,19 +66,19 @@ class MarketDataService:
 
             if len(exact_matches) >= 3:
                 return exact_matches[:10]
-            print("search closest city: ")            
+
             # 3. search closest city
             if target_lat and target_lon:
                 nearby_matches = await self._find_nearby_matches(target_lat, target_lon, target_surface,
                                                                  radius_km=15)
                 if nearby_matches is None:
                     nearby_matches = []
-                print("combined exact and close matches: ")
+
                 # combined exact and close matches
                 combined_matches = exact_matches + nearby_matches
                 if len(combined_matches) >= 3:
                     return self._deduplicate_and_rank(combined_matches)[:10]
-            print("regional fallback: ")
+
             # 4. regional fallback    
             regional_matches = self._find_regional_matches(target_city, target_surface)
 
@@ -89,12 +89,12 @@ class MarketDataService:
                 all_matches = exact_matches + regional_matches
                 return self._deduplicate_and_rank(all_matches)[:10]
 
-            print("last fallback: simulated data ")
+
             # 5. last fallback with simulate data
             return self._generate_smart_fallback(target_city, target_surface, exact_matches)
         
         except Exception as e:
-            print(f"Error in get_market_comparables: {e}")
+            self.logger.error(f"Error in get_market_comparables: {e}")
             return self._generate_fallback_comparables(target_city, target_surface)
         
     async def _refresh_data_if_needed(self):
@@ -279,7 +279,7 @@ class MarketDataService:
             return []
         
         nearby_comparables = []
-        print("start finding nearby matches")
+
         for _, row in self.sheet_data.iterrows():
             try:
                 row_lat, row_lon = None, None
@@ -320,9 +320,9 @@ class MarketDataService:
                             'source':'sheet_nearby'
                         })
             except Exception as e:
-                print(f"Error processing row: {row}")
+                self.logger.error(f"Error processing row: {row}")
                 continue
-        print(f"finished finding nearby matches : {len(nearby_comparables)} found")
+        self.logger.info(f"finished finding nearby matches : {len(nearby_comparables)} found")
         return sorted(nearby_comparables, key=lambda x: x['similarity_score'], reverse=True)
     
     def _find_regional_matches(self, target_city: str, target_surface: float) -> List[Dict]:
