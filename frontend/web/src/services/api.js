@@ -1,4 +1,12 @@
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+const getApiBaseUrl = () => {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:8000';
+    }
+    else {
+        return 'https://api.leaseboost.fr';
+    }
+}
+const API_BASE_URL = getApiBaseUrl();
 
 class ApiService{
     async analyzeLease(file) {

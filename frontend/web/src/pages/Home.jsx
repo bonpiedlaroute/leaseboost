@@ -1,7 +1,91 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/common/Button';
+import ApiService from '../services/api';
+import Analytics from '../services/analytics';
 
 const Home = () => {
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState('');
+  const [uploadError, setUploadError] = useState(null);
+
+  const handleUploadClick = () => {
+    Analytics.trackEvent('analysis_button_clicked',{
+      button_location: 'home_page',
+      user_action: 'upload_initiated'
+    });
+    fileInputRef.current?.click();
+  }
+
+  const handleFileChange = async (event) => {
+    const files = Array.from(event.target.files);
+    if(files.length ===  0) return;
+
+    const file = files[0];
+
+    const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+    const startTime = Date.now();
+    Analytics.trackAnalysisStart(file.name, `${fileSizeMB}MB`);
+
+    //client side validation
+    if(!file.type.includes('pdf') && !file.type.includes('document')) {
+      setUploadError('Format non supporté. Veuillez utiliser un fichier PDF ou DOCX.');
+      return;
+    }
+
+    if(file.size > 10 * 1024 * 1024) {
+      setUploadError('Fichier trop volumineux. Maximum 10MB autorisé.');
+    }
+
+    setIsAnalyzing(true);
+    setUploadError(null);
+
+    try {
+       // progress bar 
+       setAnalysisProgress('📄 Extraction du texte...');
+       await new Promise(resolve => setTimeout(resolve, 2000));
+
+       setAnalysisProgress('🏢 Analyse du marché local...');
+       await new Promise(resolve => setTimeout(resolve, 3000));
+
+       setAnalysisProgress('⚖️ Vérification conformité juridique...');
+       await new Promise(resolve => setTimeout(resolve, 2000));
+
+       setAnalysisProgress('💰 Calcul des opportunités...');
+
+       // real analysis
+       const analysisResult = await ApiService.analyzeLease(file);
+
+       setAnalysisProgress('✅ Analyse terminée !');
+
+       const analysisTime = (Date.now() - startTime) / 1000;
+       Analytics.trackAnalysisComplete(file.name, analysisTime);
+
+       sessionStorage.setItem('leaseAnalysis', JSON.stringify(analysisResult));
+       sessionStorage.setItem('leaseFileName', file.name);
+
+       setTimeout(() => {
+         navigate('/analysis');
+       }, 800);
+    }
+    catch(error) {
+      setUploadError(error.message);
+      setIsAnalyzing(false);
+      setAnalysisProgress('');
+
+      Analytics.trackEvent('analysis_error', {
+        error_message: error.message,
+        file_name: file.name,
+        file_size: `${fileSizeMB}MB`
+      });
+    } finally {
+      // reset input
+      event.target.value = '';
+    }
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{
@@ -28,20 +112,89 @@ const Home = () => {
       <div className="flex flex-wrap justify-between gap-3 p-4">
         <p className="text-[#0d141c] tracking-light text-2xl sm:text-[32px] font-bold leading-tight min-w-0 sm:min-w-72">Analyse de Bail</p>
       </div>
+      {/* upload section*/}
       <div className="flex flex-col p-4">
-        <div className="flex flex-col items-center gap-6 rounded-lg border-2 border-dashed border-[#cedbe8] px-4 sm:px-6 py-10 sm:py-14">
-          <div className="flex w-full max-w-[480px] flex-col items-center gap-2 px-4">
-            <p className="text-[#0d141c] text-base sm:text-lg font-bold leading-tight tracking-[-0.015em] text-center">
-              Déposez vos baux ici ou cliquez pour parcourir
-            </p>
-            <p className="text-[#0d141c] text-xs sm:text-sm font-normal leading-normal text-center">
-              Formats acceptés : PDF, DOCX. Jusqu'à 10 fichiers simultanément..
-            </p>
-          </div>
-          <Button unstyled className="flex min-w-[120px] sm:min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#e7edf4] text-[#0d141c] text-sm font-bold leading-normal tracking-[0.015em] w-full sm:w-auto" >
-            <span className="truncate">Lancer l'analyse</span></Button>
+        <div className={`flex flex-col items-center gap-6 rounded-lg border-2 ${
+          isAnalyzing ? 'border-blue-300 bg-blue-50' : 'border-dashed border-[#cedbe8]'
+        } px-4 sm:px-6 py-10 sm:py-14 transition-all duration-300`}>
+          
+          {!isAnalyzing ? (
+            <>
+              <div className="flex w-full max-w-[480px] flex-col items-center gap-2 px-4">
+                <p className="text-[#0d141c] text-base sm:text-lg font-bold leading-tight tracking-[-0.015em] text-center">
+                  Déposez votre bail commercial ici ou cliquez pour parcourir
+                </p>
+                <p className="text-[#0d141c] text-xs sm:text-sm font-normal leading-normal text-center">
+                  Formats acceptés : PDF, DOCX • Maximum 10MB • Analyse en 30-60 secondes
+                </p>
+                <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span>🏢 Benchmark marché</span>
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <span>⚖️ Conformité juridique</span>
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span>💰 Optimisation financière</span>
+                </div>
+              </div>
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.docx"
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+              
+              <Button 
+                unstyled 
+                className="flex min-w-[120px] sm:min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0c7ff2] hover:bg-blue-600 text-white text-sm font-bold leading-normal tracking-[0.015em] w-full sm:w-auto transition-colors shadow-lg"
+                onClick={handleUploadClick}
+              >
+                <span className="truncate">🚀 Lancer l'analyse intelligente</span>
+              </Button>
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-4 max-w-[480px]">
+              <div className="w-16 h-16 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+              
+              <div className="text-center">
+                <p className="text-[#0c7ff2] text-lg font-bold mb-2">
+                  Analyse en cours...
+                </p>
+                <p className="text-[#49739c] text-sm">
+                  {analysisProgress}
+                </p>
+              </div>
+              
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                  style={{ 
+                    width: analysisProgress.includes('✅') ? '100%' : 
+                           analysisProgress.includes('💰') ? '75%' :
+                           analysisProgress.includes('⚖️') ? '50%' :
+                           analysisProgress.includes('🏢') ? '25%' : '10%'
+                  }}
+                ></div>
+              </div>
+              
+              <p className="text-xs text-gray-500 text-center">
+                Notre IA analyse votre bail avec les données de marché en temps réel
+              </p>
+            </div>
+          )}
+          
+          {uploadError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-[480px] w-full">
+              <p className="text-red-800 text-sm font-medium">
+                ❌ {uploadError}
+              </p>
+            </div>
+          )}
         </div>
       </div>
+
+
       <p className="text-[#49739c] text-xs sm:text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline">
         En important vos documents, vous acceptez nos conditions générales d'utilisations et notre Politique de confidentialité.
       </p>

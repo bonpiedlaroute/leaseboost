@@ -382,8 +382,8 @@ class LegalComplianceService:
 
         article = legal_mapping.get(clause_type.lower(), "L145-1")
 
-        if not self.legifrance_token:
-            self.legifrance_token = await self._authenticate_legifrance()
+        #if not self.legifrance_token:
+        self.legifrance_token = await self._authenticate_legifrance()
 
         if not self.legifrance_token:
             self.logger.error("Error during LegiFrance authentication - using local framework")

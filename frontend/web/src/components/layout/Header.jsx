@@ -10,17 +10,11 @@ const Header = () => {
   //mapping of navigation name to react routes
   const getRouteForNavItem = (navItem) => {
     switch(navItem) {
-      case 'Tableau de bord':
+      case 'Accueil':
         return '/';
-      case 'Portefeuille':
-        return '/portfolio';
       case 'Analyse':
         return '/analysis';
-      case 'Baux':
-        return '/portfolio';
-      case 'Rapports':
-        return '/analysis';
-      case 'Paramètres':
+      case 'A propos':
         return '/';
       default:
         return '/';
@@ -30,54 +24,67 @@ const Header = () => {
     switch(location.pathname) {
       case '/analysis':
         return {
-          nav: ['Tableau de bord', 'Portefeuille', 'Analyse', 'Rapports', 'Paramètres'],
-          avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBQOTmSy8D0yAT-1Lkfif6yiWzW6XJcdaE407K-CgP1eb2DF1fp_r3QeCSrKpf-kpcCZEB3lr005004K7roUkKGl_k-IimvwAcPWW3Dv_zFvWdBaLu16gVEDc8Cit8GNlKqXLIIUw-ZCjtFCXrWR980BHMnnB7xirVA6tWs4LuoqT7DOJh6rtFrytpW1Vjc5Ev5jLQsPByOFRUGGlYOt274vZixbqp2_2ti0EQbjWE6cbkeY7XbrNyLRcsBicL9lTTWH-FK3GcaRmYn'
-        };
-      case '/portfolio':
-        return {
-          nav: ['Tableau de bord', 'Portefeuille', 'Baux', 'Rapports', 'Aide'],
-          avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBQOTmSy8D0yAT-1Lkfif6yiWzW6XJcdaE407K-CgP1eb2DF1fp_r3QeCSrKpf-kpcCZEB3lr005004K7roUkKGl_k-IimvwAcPWW3Dv_zFvWdBaLu16gVEDc8Cit8GNlKqXLIIUw-ZCjtFCXrWR980BHMnnB7xirVA6tWs4LuoqT7DOJh6rtFrytpW1Vjc5Ev5jLQsPByOFRUGGlYOt274vZixbqp2_2ti0EQbjWE6cbkeY7XbrNyLRcsBicL9lTTWH-FK3GcaRmYn'
+          nav: ['Accueil', 'Nouvelle Analyse', 'Contact'],
+          showStatus: true
         };
       default: // Home
         return {
-          nav: ['Tableau de bord', 'Portefeuille', 'Rapports', 'Aide'],
-          avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBQOTmSy8D0yAT-1Lkfif6yiWzW6XJcdaE407K-CgP1eb2DF1fp_r3QeCSrKpf-kpcCZEB3lr005004K7roUkKGl_k-IimvwAcPWW3Dv_zFvWdBaLu16gVEDc8Cit8GNlKqXLIIUw-ZCjtFCXrWR980BHMnnB7xirVA6tWs4LuoqT7DOJh6rtFrytpW1Vjc5Ev5jLQsPByOFRUGGlYOt274vZixbqp2_2ti0EQbjWE6cbkeY7XbrNyLRcsBicL9lTTWH-FK3GcaRmYn'
+          nav: ['Accueil', 'A propos', 'Contact'],
+          showStatus: false
         };
     }
   };
 
-  const { nav, avatar } = getPageData();
+  const { nav, showStatus } = getPageData();
   
-  return (
-    <header className="relative flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e7edf4] px-4 sm:px-10 py-3">
+    return (
+    <header className="relative flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e7edf4] px-4 sm:px-10 py-3 bg-white">
       <div className="flex items-center gap-4 text-[#0d141c]">
         <Logo />
-        <h2 className="text-[#0d141c] text-lg font-bold leading-tight tracking-[-0.015em] hidden sm:block">LeaseBoost</h2>
-         <h2 className="text-[#0d141c] text-sm font-bold leading-tight tracking-[-0.015em] sm:hidden">LeaseBoost</h2>
+        <Link to="/" className="flex items-center gap-2">
+          <h2 className="text-[#0d141c] text-lg font-bold leading-tight tracking-[-0.015em] hidden sm:block">
+            LeaseBoost
+          </h2>
+          <h2 className="text-[#0d141c] text-sm font-bold leading-tight tracking-[-0.015em] sm:hidden">
+            LeaseBoost
+          </h2>
+        </Link>
+        {showStatus && (
+          <div className="hidden md:flex items-center gap-2 ml-4">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-sm text-green-600 font-medium">Analyse active</span>
+          </div>
+        )}
       </div>
+
+      {/* Desktop Navigation */}
       <div className="hidden lg:flex flex-1 justify-end gap-8">
-        <div className="flex items-center gap-9">
+        <div className="flex items-center gap-6">
           {nav.map((item) => (
             <Link
               key={item}
               to={getRouteForNavItem(item)}
-              className="text-[#0d141c] text-sm font-medium leading-normal"
+              className={`text-sm font-medium leading-normal transition-colors ${
+                (item === 'Accueil' && location.pathname === '/') ||
+                (item === 'Analyse' && location.pathname === '/analysis')
+                  ? 'text-[#0c7ff2]'
+                  : 'text-[#0d141c] hover:text-[#0c7ff2]'
+              }`}
             >
-              {item}
+              {item === 'Nouvelle Analyse' ? '+ Nouvelle Analyse' : item}
             </Link>
           ))}
+          
+          <a  href="mailto:info@leaseboost.fr"
+            className="bg-[#0c7ff2] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+          >
+            📧 Contact
+          </a>
         </div>
-        <div
-          className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-          style={{ backgroundImage: `url("${avatar}")` }}
-        />
       </div>
 
+      {/* Mobile Navigation */}
       <div className="lg:hidden flex items-center gap-4">
-        <div
-          className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8"
-          style={{ backgroundImage: `url("${avatar}")` }}
-        />
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="text-[#0d141c] p-2"
@@ -99,9 +106,16 @@ const Header = () => {
                 className="text-[#0d141c] text-sm font-medium leading-normal px-4 py-3 hover:bg-gray-50"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {item}
+                {item === 'Nouvelle Analyse' ? '+ Nouvelle Analyse' : item}
               </Link>
             ))}
+            
+            <a  href="mailto:info@leaseboost.fr"
+              className="text-[#0c7ff2] text-sm font-medium leading-normal px-4 py-3 hover:bg-gray-50"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              📧 Contact
+            </a>
           </div>
         </div>
       )}
