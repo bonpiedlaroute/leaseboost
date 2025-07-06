@@ -1,8 +1,10 @@
 const getApiBaseUrl = () => {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.log(' using localhost url');
         return 'http://localhost:8000';
     }
     else {
+        console.log(' using production url');
         return 'https://api.leaseboost.fr';
     }
 }

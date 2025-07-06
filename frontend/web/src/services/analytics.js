@@ -58,7 +58,7 @@ class AnalyticsService {
 
         try {
             if (typeof gtag !== 'undefined') {
-                gtag('event', evantName, {
+                gtag('event', eventName, {
                     custom_parameter_1: parameters,
                     ...parameters
                 });
