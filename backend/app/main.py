@@ -1,4 +1,5 @@
 import logging
+import os
 from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from app.services.document_parser import DocumentParser
@@ -36,17 +37,36 @@ app = FastAPI(
     descriptiion="API for intelligent lease analysis",
 )
 
+# Services
+app_logger = create_logger()
+
+# CORS configuration
+def get_allowed_origins():
+    allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
+
+    if allowed_origins_env:
+        origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+        app_logger.info(f"Allowed origins: {origins}")
+        return origins
+    else:
+        fallback_origins = [
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "https://leaseboost.fr"
+            ]
+        app_logger.info(f"Cors origins fallback: {fallback_origins}")
+        return fallback_origins
+
+allowed_origins = get_allowed_origins()
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Services
-app_logger = create_logger()
 
 file_cleanup_service = FileCleanupService(logger=app_logger)
 

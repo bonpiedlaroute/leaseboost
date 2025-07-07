@@ -45,13 +45,13 @@ const Home = () => {
     try {
        // progress bar 
        setAnalysisProgress('📄 Extraction du texte...');
-       await new Promise(resolve => setTimeout(resolve, 10000));
+       await new Promise(resolve => setTimeout(resolve, 5000));
 
        setAnalysisProgress('🏢 Analyse du marché local...');
-       await new Promise(resolve => setTimeout(resolve, 10000));
+       await new Promise(resolve => setTimeout(resolve, 5000));
 
        setAnalysisProgress('⚖️ Vérification conformité juridique...');
-       await new Promise(resolve => setTimeout(resolve, 10000));
+       await new Promise(resolve => setTimeout(resolve, 5000));
 
        setAnalysisProgress('💰 Calcul des opportunités...');
 

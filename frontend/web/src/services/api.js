@@ -20,7 +20,7 @@ class ApiService{
         const timeoutId = setTimeout( () => controller.abort(), 180000); // 3 minutes
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/analyze-lease/`, {
+            const response = await fetch(`${API_BASE_URL}/api/analyze-lease`, {
                 method: 'POST',
                 body: formData,
                 signal: controller.signal,
@@ -45,7 +45,7 @@ class ApiService{
     }
 
     async healthCheck() {
-        const response = await fetch(`${API_BASE_URL}/api/health-check/`);
+        const response = await fetch(`${API_BASE_URL}/api/health-check`);
         return response.json();
     }
 }
