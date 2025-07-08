@@ -528,7 +528,7 @@ const FinancialAnalysis = () => {
                     <span className="font-medium text-green-900">{analysis.financial_metrics?.optimized_rent || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-green-700">Économies potentielles:</span>
+                    <span className="text-green-700">Gain potentiel:</span>
                     <span className="font-bold text-green-900 text-lg">{analysis.financial_metrics?.potential_savings || 'N/A'}</span>
                   </div>
                 </div>
