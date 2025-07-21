@@ -43,20 +43,22 @@ const Home = () => {
     setUploadError(null);
 
     try {
+
+      const analyisiPromise =ApiService.analyzeLease(file);
        // progress bar 
        setAnalysisProgress('📄 Extraction du texte...');
        await new Promise(resolve => setTimeout(resolve, 5000));
 
        setAnalysisProgress('🏢 Analyse du marché local...');
-       await new Promise(resolve => setTimeout(resolve, 5000));
+       await new Promise(resolve => setTimeout(resolve, 10000));
 
        setAnalysisProgress('⚖️ Vérification conformité juridique...');
-       await new Promise(resolve => setTimeout(resolve, 5000));
+       await new Promise(resolve => setTimeout(resolve, 10000));
 
        setAnalysisProgress('💰 Calcul des opportunités...');
 
        // real analysis
-       const analysisResult = await ApiService.analyzeLease(file);
+       const analysisResult = await analyisiPromise;
 
        setAnalysisProgress('✅ Analyse terminée !');
 
@@ -106,16 +108,34 @@ const Home = () => {
       })
     }} />
 
-      <div className="flex flex-wrap justify-between gap-3 p-4">
-      <h1 className="text-[#0d141c] tracking-light text-2xl sm:text-[32px] font-bold leading-tight min-w-0 sm:min-w-72">Analyse de Baux Commerciaux par Intelligence Artificielle</h1>
+      <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
+        <div className="text-center mb-12 animate-fade-in-up">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text text-transparent leading-normal mb-6 pb-2">Analyse de Baux Commerciaux par Intelligence Artificielle</h1>
+        </div>
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-blue-100">
+            <span className="text-green-600">🛡️</span>
+            <span className="text-sm font-medium text-gray-700">RGPD Conforme</span>
+          </div>
+          <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-blue-100">
+             <span className="text-blue-600">⏱️</span>
+            <span className="text-sm font-medium text-gray-700">30-60 secondes</span>
+          </div>
+          <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-blue-100">
+             <span className="text-purple-600">📈</span>
+            <span className="text-sm font-medium text-gray-700">1,247 baux analysés</span>
+          </div>
+        </div>
       </div>
+
       <div className="flex flex-wrap justify-between gap-3 p-4">
         <p className="text-[#0d141c] tracking-light text-2xl sm:text-[32px] font-bold leading-tight min-w-0 sm:min-w-72">Analyse de Bail</p>
       </div>
       {/* upload section*/}
       <div className="flex flex-col p-4">
         <div className={`flex flex-col items-center gap-6 rounded-lg border-2 ${
-          isAnalyzing ? 'border-blue-300 bg-blue-50' : 'border-dashed border-[#cedbe8]'
+          isAnalyzing ? 'border-blue-300 bg-blue-50' : 
+          'border-dashed border-[#cedbe8] bg-white hover:border-blue-300 hover:shadow-lg'
         } px-4 sm:px-6 py-10 sm:py-14 transition-all duration-300`}>
           
           {!isAnalyzing ? (
@@ -145,13 +165,19 @@ const Home = () => {
                 style={{ display: 'none' }}
               />
               
-              <Button 
-                unstyled 
-                className="flex min-w-[120px] sm:min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0c7ff2] hover:bg-blue-600 text-white text-sm font-bold leading-normal tracking-[0.015em] w-full sm:w-auto transition-colors shadow-lg"
+              <button
                 onClick={handleUploadClick}
+                className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
               >
-                <span className="truncate">🚀 Lancer l'analyse intelligente</span>
-              </Button>
+                <div className="flex items-center justify-center gap-3">
+                  <span>⚡</span>
+                  <span>Lancer l'analyse intelligente</span>
+                </div>
+  
+                {/* gloss effect */}
+                <div className="absolute inset-0 -top-4 -bottom-4 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-full group-hover:translate-x-[-200%] transition-transform duration-1000">
+                </div>
+              </button>
             </>
           ) : (
             <div className="flex flex-col items-center gap-4 max-w-[480px]">
@@ -166,16 +192,18 @@ const Home = () => {
                 </p>
               </div>
               
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                 <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                  className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-1000 ease-out relative"
                   style={{ 
                     width: analysisProgress.includes('✅') ? '100%' : 
                            analysisProgress.includes('💰') ? '75%' :
                            analysisProgress.includes('⚖️') ? '50%' :
                            analysisProgress.includes('🏢') ? '25%' : '10%'
                   }}
-                ></div>
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 animate-pulse"></div>
+                </div>
               </div>
               
               <p className="text-xs text-gray-500 text-center">

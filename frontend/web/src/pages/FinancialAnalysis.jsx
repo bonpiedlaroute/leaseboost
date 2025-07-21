@@ -210,69 +210,126 @@ const FinancialAnalysis = () => {
             
             {/* keys metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <span className="text-blue-600 text-sm">🏢</span>
-                    </div>
+              
+              {/* market position */}
+              <div className="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-red-100 to-rose-100 flex items-center justify-center">
+                    <span className="text-red-600 text-lg">🏢</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Position Marché</p>
-                    <p className="text-lg md:text-xl font-semibold text-gray-900">
-                      {analysis.market_intelligence?.percentile_position?.split(' - ')[0] || 'N/A'}
-                    </p>
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    📉 Sous-évalué
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-600">Position Marché</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {analysis.market_intelligence?.percentile_position?.split(' - ')[0] || 'N/A'}
+                  </p>
+                  <p className="text-sm text-gray-500">percentile</p>
+                </div>
+                {/* small circular graphic */}
+                <div className="mt-4 flex justify-center">
+                  <div className="relative w-16 h-16">
+                    <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 32 32">
+                      <circle cx="16" cy="16" r="12" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                      <circle cx="16" cy="16" r="12" fill="none" stroke="#ef4444" strokeWidth="3"
+                              strokeDasharray="0 100" strokeLinecap="round" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xs font-bold text-gray-700">0%</span>
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                      <span className="text-green-600 text-sm">⚖️</span>
-                    </div>
+              {/* Compliance */}
+              <div className="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-yellow-100 to-amber-100 flex items-center justify-center">
+                    <span className="text-yellow-600 text-lg">⚖️</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Conformité</p>
-                    <p className="text-lg md:text-xl font-semibold text-gray-900">
-                      {analysis.compliance_score?.split(' - ')[0] || 'N/A'}
-                    </p>
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    ⚠️ Risques
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-600">Conformité</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {analysis.compliance_score?.split(' - ')[0] || 'N/A'}
+                  </p>
+                  <p className="text-sm text-gray-500">score</p>
+                </div>
+                {/* small circular graphic */}
+                <div className="mt-4 flex justify-center">
+                  <div className="relative w-16 h-16">
+                    <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 32 32">
+                      <circle cx="16" cy="16" r="12" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                      <circle cx="16" cy="16" r="12" fill="none" stroke="#f59e0b" strokeWidth="3"
+                              strokeDasharray="50 100" strokeLinecap="round" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xs font-bold text-gray-700">50%</span>
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                      <span className="text-yellow-600 text-sm">💰</span>
-                    </div>
+              {/* Opportunities */}
+              <div className="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+                    <span className="text-green-600 text-lg">💰</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Opportunités</p>
-                    <p className="text-lg md:text-xl font-semibold text-gray-900">
-                      {analysis.opportunities?.length || 0}
-                    </p>
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    📈 +43%
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-600">Opportunités</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {analysis.opportunities?.length || 0}
+                  </p>
+                  <p className="text-sm text-gray-500">identifiées</p>
+                </div>
+                {/* small circular graphic */}
+                <div className="mt-4 flex justify-center">
+                  <div className="relative w-16 h-16">
+                    <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 32 32">
+                      <circle cx="16" cy="16" r="12" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                      <circle cx="16" cy="16" r="12" fill="none" stroke="#10b981" strokeWidth="3"
+                              strokeDasharray="75 100" strokeLinecap="round" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xs font-bold text-gray-700">75%</span>
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-200">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                      <span className="text-red-600 text-sm">🚨</span>
-                    </div>
+              {/* Alerts */}
+              <div className="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-red-100 to-rose-100 flex items-center justify-center">
+                    <span className="text-red-600 text-lg">🚨</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Alertes</p>
-                    <p className="text-lg md:text-xl font-semibold text-gray-900">
-                      {(analysis.legal_alerts?.length || 0) + (analysis.critical_deadlines?.length || 0)}
-                    </p>
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    🔥 Urgent
                   </div>
                 </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-600">Alertes</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {(analysis.legal_alerts?.length || 0) + (analysis.critical_deadlines?.length || 0)}
+                  </p>
+                  <p className="text-sm text-gray-500">critiques</p>
+                </div>
+                {/* animation for alerts */}
+                <div className="mt-4 flex justify-center">
+                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                </div>
               </div>
+              
             </div>
 
             {/* urgent alerts if any */}
@@ -318,7 +375,7 @@ const FinancialAnalysis = () => {
         {/* Market positon */}
         {activeTab === 'market' && (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4 md:p-6">
               <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-6">🏢 Analyse de Position Marché</h2>
               
               <div className="grid md:grid-cols-2 gap-6">
@@ -357,7 +414,7 @@ const FinancialAnalysis = () => {
 
             {/* Comparables */}
             {analysis.market_intelligence?.comparables?.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4 md:p-6">
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">
                   📊 Comparables du Marché Local ({analysis.market_intelligence.comparable_count} identifiés)
                 </h3>
@@ -403,7 +460,7 @@ const FinancialAnalysis = () => {
           <div className="space-y-6">
             
             {/* Compliance score */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4 md:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                 <h2 className="text-lg md:text-xl font-bold text-gray-900">⚖️ Conformité Juridique</h2>
                 <div className="text-left sm:text-right">
@@ -425,7 +482,7 @@ const FinancialAnalysis = () => {
 
             {/* Critical deadlines */}
             {analysis.critical_deadlines?.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4 md:p-6">
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">📅 Échéances Critiques</h3>
                 <div className="space-y-4">
                   {analysis.critical_deadlines.map((deadline, index) => (
@@ -463,7 +520,7 @@ const FinancialAnalysis = () => {
 
             {/* Legal alerts */}
             {analysis.legal_alerts?.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4 md:p-6">
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">⚠️ Alertes Juridiques</h3>
                 <div className="space-y-4">
                   {analysis.legal_alerts.map((alert, index) => (
@@ -506,7 +563,7 @@ const FinancialAnalysis = () => {
             
             {/* financial metrics */}
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4 md:p-6">
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">📊 Métriques Actuelles</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
@@ -522,26 +579,30 @@ const FinancialAnalysis = () => {
               
               <div className="bg-green-50 rounded-lg border border-green-200 p-4 md:p-6">
                 <h3 className="text-base md:text-lg font-semibold text-green-900 mb-4">🎯 Potentiel Optimisé</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-green-700">Loyer optimisé:</span>
-                    <span className="font-medium text-green-900">{analysis.financial_metrics?.optimized_rent || 'N/A'}</span>
+                <div className="space-y-4">
+
+                  <div>
+                    <div className="text-green-700 font-medium mb-1">Loyer optimisé:</div>
+                    <div className="font-bold text-green-900 text-lg">{analysis.financial_metrics?.optimized_rent || 'N/A'}</div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-700">Gain potentiel:</span>
-                    <span className="font-bold text-green-900 text-lg">{analysis.financial_metrics?.potential_savings || 'N/A'}</span>
+
+                  <div>
+                    <div className="text-green-700">Gain potentiel:</div>
+                    <div className="font-bold text-green-900 text-lg">{analysis.financial_metrics?.potential_savings || 'N/A'}</div>
                   </div>
+
+
                 </div>
               </div>
             </div>
 
             {/* List of opportunities */}
             {analysis.opportunities?.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4 md:p-6">
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-6">💰 Opportunités d'Optimisation Identifiées</h3>
                 <div className="space-y-4">
                   {analysis.opportunities.map((opportunity, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-4">
+                    <div key={index} className="border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 rounded-lg p-4">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                         <div className="flex-1">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">

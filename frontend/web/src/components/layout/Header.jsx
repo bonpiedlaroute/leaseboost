@@ -50,9 +50,9 @@ const Header = () => {
           </h2>
         </Link>
         {showStatus && (
-          <div className="hidden md:flex items-center gap-2 ml-4">
+          <div className="hidden md:flex items-center gap-2 ml-4 px-3 py-1 bg-green-50 rounded-full border border-green-200">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm text-green-600 font-medium">Analyse active</span>
+            <span className="text-sm text-green-700 font-medium">Analyse active</span>
           </div>
         )}
       </div>
@@ -75,10 +75,15 @@ const Header = () => {
             </Link>
           ))}
           
-          <a  href="mailto:info@leaseboost.fr"
-            className="bg-[#0c7ff2] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+          <a href="mailto:info@leaseboost.fr"
+            className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-sm hover:shadow-md"
           >
-            📧 Contact
+            <div className="flex items-center gap-2 relative z-10">
+              <span>📧</span>
+              <span>Contact</span>
+            </div>
+            
+            <div className="absolute inset-0 -top-2 -bottom-2 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-full group-hover:translate-x-[-200%] transition-transform duration-700"></div>
           </a>
         </div>
       </div>
